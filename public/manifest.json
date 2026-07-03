@@ -1,0 +1,16 @@
+{
+  "name": "Highlanders Amateur Taekwondo CIC",
+  "short_name": "Highlanders TKD",
+  "description": "Professional Taekwondo training and community development",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e3a8a",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
