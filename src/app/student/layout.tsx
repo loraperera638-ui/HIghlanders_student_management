@@ -1,7 +1,8 @@
 'use client';
 
-import { Home, CreditCard, DollarSign, User, LogOut, GraduationCap, ShieldCheck, Globe } from 'lucide-react';
-import { redirect, usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { Home, CreditCard, DollarSign, User, LogOut, GraduationCap, ShieldCheck, Globe, Menu, X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { logout } from '@/utils/auth';
 
 export default function StudentLayout({
@@ -10,6 +11,7 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
     { name: 'Dashboard', href: '/student', icon: Home },
@@ -19,27 +21,48 @@ export default function StudentLayout({
   ];
 
   return (
-    <div className="h-screen bg-slate-50/50 flex flex-col font-sans">
-      <div className="flex flex-1 overflow-hidden">
+    <div className="h-screen bg-slate-50/50 flex flex-col font-sans relative overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile Sidebar Backdrop Overlay */}
+        {isSidebarOpen && (
+          <div 
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
+          />
+        )}
+
         {/* Sidebar */}
-        <aside className="w-68 bg-gradient-to-b from-[#0A1128] to-[#101b3f] text-white min-h-full flex-shrink-0 flex flex-col border-r border-white/5">
+        <aside className={`fixed inset-y-0 left-0 w-68 bg-gradient-to-b from-[#0A1128] to-[#101b3f] text-white min-h-full flex-shrink-0 flex flex-col border-r border-white/5 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
           {/* Sidebar Header / Logo */}
-          <div className="p-6 border-b border-white/5 flex items-center space-x-3.5">
-            <div className="w-10 h-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center p-1.5 shadow-inner">
-              <img 
-                src="/images/logo.png" 
-                alt="Highlanders logo" 
-                className="w-full h-full object-contain"
-              />
+          <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-10 h-10 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center p-1.5 shadow-inner">
+                <img 
+                  src="/images/logo.png" 
+                  alt="Highlanders logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div>
+                <h1 className="text-[14px] font-black tracking-widest uppercase leading-none text-white">
+                  Highlanders
+                </h1>
+                <span className="text-[9px] text-primary-wave font-bold uppercase tracking-widest mt-0.5 inline-block">
+                  Student Portal
+                </span>
+              </div>
             </div>
-            <div>
-              <h1 className="text-[14px] font-black tracking-widest uppercase leading-none text-white">
-                Highlanders
-              </h1>
-              <span className="text-[9px] text-primary-wave font-bold uppercase tracking-widest mt-0.5 inline-block">
-                Student Portal
-              </span>
-            </div>
+            
+            {/* Close Sidebar button on mobile */}
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+              aria-label="Close Sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
           {/* Navigation Links */}
@@ -50,6 +73,7 @@ export default function StudentLayout({
                 <a
                   key={item.name}
                   href={item.href}
+                  onClick={() => setIsSidebarOpen(false)}
                   className={`flex items-center px-4 py-3 rounded-xl font-medium transition-all duration-300 group ${
                     isActive
                       ? 'bg-gradient-to-r from-primary-sunset/15 to-primary-sunset/5 border border-primary-sunset/30 text-white shadow-lg shadow-primary-sunset/5'
@@ -96,33 +120,44 @@ export default function StudentLayout({
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <header className="bg-white/80 backdrop-blur-md border-b border-gray-100/80 px-8 py-4.5 flex-shrink-0 flex items-center justify-between shadow-sm shadow-gray-100/10">
-            <h2 className="text-lg font-bold text-gray-900 tracking-wide">
-              {navItems.find(n => n.href === pathname)?.name || 'Student Dashboard'}
-            </h2>
+          <header className="bg-white/80 backdrop-blur-md border-b border-gray-100/80 px-4 sm:px-8 py-3.5 flex-shrink-0 flex items-center justify-between shadow-sm shadow-gray-100/10">
+            <div className="flex items-center space-x-3">
+              {/* Hamburger Button */}
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                aria-label="Open Sidebar"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              
+              <h2 className="text-sm sm:text-lg font-bold text-gray-900 tracking-wide truncate max-w-[150px] sm:max-w-none">
+                {navItems.find(n => n.href === pathname)?.name || 'Student Dashboard'}
+              </h2>
+            </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 px-3.5 py-1.5 bg-slate-100 rounded-xl border border-slate-200/50">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                <span className="text-xs font-semibold text-slate-600">Verified Member</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 px-2.5 sm:px-3.5 py-1.5 bg-slate-100 rounded-xl border border-slate-200/50">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" />
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-600 hidden xs:inline">Verified Member</span>
               </div>
               <button 
                 onClick={logout}
-                className="flex items-center space-x-2 px-4.5 py-2 border border-red-100 text-red-500 font-semibold rounded-xl text-xs hover:bg-red-50 hover:border-red-200 transition-all duration-200 shadow-sm"
+                className="flex items-center space-x-1.5 sm:space-x-2 px-3 sm:px-4.5 py-2 border border-red-100 text-red-500 font-semibold rounded-xl text-[10px] sm:text-xs hover:bg-red-50 hover:border-red-200 transition-all duration-200 shadow-sm"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>Logout</span>
               </button>
             </div>
           </header>
           
           {/* Dynamic Content */}
-          <main className="flex-1 overflow-y-auto p-8 bg-slate-50/50 relative">
+          <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-50/50 relative">
             {children}
           </main>
 
           {/* Footer */}
-          <footer className="bg-white border-t border-gray-100 px-8 py-4 flex-shrink-0 flex items-center justify-between text-xs text-gray-500 font-medium">
+          <footer className="bg-white border-t border-gray-100 px-4 sm:px-8 py-4 flex-shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left text-[10px] sm:text-xs text-gray-500 font-medium">
             <p>&copy; {new Date().getFullYear()} Highlanders Amateur Taekwondo CIC. All rights reserved.</p>
             <p className="text-gray-400">Powered by FlexNode Solutions</p>
           </footer>

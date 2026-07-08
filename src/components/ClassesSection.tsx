@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Clock, Users, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Clock, Users, Calendar, ChevronRight, X } from 'lucide-react';
 import { Class } from '@/types';
 import { useInquiry } from '@/contexts/InquiryContext';
 
 const ClassesSection = () => {
   const [classes, setClasses] = useState<Class[]>([]);
+  const [selectedClassForModal, setSelectedClassForModal] = useState<Class | null>(null);
   const { openInquiryModal } = useInquiry();
 
   useEffect(() => {
@@ -89,9 +90,21 @@ const ClassesSection = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-600 text-sm mb-8 leading-relaxed">
-                    {classItem.description}
-                  </p>
+                  <div className="mb-8">
+                    <p className={`text-gray-600 text-sm leading-relaxed ${classItem.description.length > 220 ? 'line-clamp-5' : ''}`}>
+                      {classItem.description}
+                    </p>
+                    {classItem.description.length > 220 && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedClassForModal(classItem)}
+                        className="text-xs font-bold text-primary-wave hover:text-primary-sunset mt-2 transition-colors inline-flex items-center space-x-0.5"
+                      >
+                        <span>Show More</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* CTA Button */}
@@ -132,6 +145,107 @@ const ClassesSection = () => {
           </div>
         </motion.div>
       </div>
+
+      {/* Class Details Modal */}
+      <AnimatePresence>
+        {selectedClassForModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden transform transition-all duration-300 scale-100 flex flex-col relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-primary-navy to-[#121c3f] border-b-2 border-primary-sunset text-white p-5 sm:p-6 flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <span className="px-2.5 py-1 bg-white/10 text-white border border-white/20 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                      {selectedClassForModal.ageCategory}
+                    </span>
+                    <h3 className="text-xl font-bold font-athletic uppercase tracking-wide mt-2 text-white leading-tight">
+                      {selectedClassForModal.name}
+                    </h3>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedClassForModal(null)}
+                  className="text-white/60 hover:text-white transition-colors p-1"
+                  aria-label="Close details"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+                <div>
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Program Description</h4>
+                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
+                    {selectedClassForModal.description}
+                  </p>
+                </div>
+
+                <div className="border-t border-slate-100 pt-4">
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">Schedule & Timing</h4>
+                  <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-2xl flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-9 h-9 bg-orange-50 border border-orange-100 rounded-xl flex items-center justify-center text-primary-sunset flex-shrink-0">
+                        <Calendar className="w-4.5 h-4.5" />
+                      </div>
+                      <div>
+                        <span className="text-xs font-black text-slate-700 block capitalize">Training Days</span>
+                        <span className="text-xs text-slate-500 font-semibold block mt-0.5">{selectedClassForModal.schedule.days.join(', ')}</span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-xs font-black text-slate-750 block">Class Timing</span>
+                      <span className="text-xs text-slate-500 font-semibold block mt-0.5">
+                        {selectedClassForModal.schedule.startTime} - {selectedClassForModal.schedule.endTime}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-4 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-5 h-5 text-primary-wave" />
+                    <span className="text-xs font-bold text-slate-600">Current Active Enrollment:</span>
+                  </div>
+                  <span className="px-3 py-1 bg-blue-50 border border-blue-100 text-primary-wave font-bold text-xs rounded-full">
+                    {selectedClassForModal.currentEnrollment} students
+                  </span>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4.5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedClassForModal(null)}
+                  className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-100 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const className = selectedClassForModal.name;
+                    setSelectedClassForModal(null);
+                    openInquiryModal(className);
+                  }}
+                  className="px-6 py-2.5 bg-primary-sunset text-white hover:bg-primary-wave rounded-xl text-xs font-black shadow-md hover:shadow-lg transition-all"
+                >
+                  Join This Class
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
