@@ -41,7 +41,7 @@ const ClassesSection = () => {
           <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 font-athletic uppercase tracking-wider">
             Our Training Programs
           </h2>
-          <div className="w-24 h-1.5 bg-gradient-to-r from-primary-sunset to-primary-wave mx-auto mb-6 rounded-full" />
+          <div className="w-24 h-1.5 bg-gradient-to-r from-primary-sunset to-[#FF3E00] mx-auto mb-6 rounded-full" />
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Discover the perfect class for your age and skill level. Our expert instructors provide personalized attention to help you achieve your martial arts goals.
           </p>

@@ -20,10 +20,11 @@ const Navbar = () => {
   }, []);
 
   const regularNavItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'Classes', href: '#classes' },
-    { name: 'About Us', href: '#about' },
-    { name: 'Contact Us', href: '#contact' },
+    { name: 'Home', href: '#home', isExternal: false },
+    { name: 'Classes', href: '#classes', isExternal: false },
+    { name: 'About Us', href: '#about', isExternal: false },
+    { name: 'Store', href: 'https://highlandersfitness.store/', isExternal: true },
+    { name: 'Contact Us', href: '#contact', isExternal: false },
   ];
 
   const handleNavClick = (href: string) => {
@@ -82,17 +83,31 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-8">
-              {regularNavItems.map((item) => (
-                <motion.button
-                  key={item.name}
-                  onClick={() => handleNavClick(item.href)}
-                  className={isScrolled ? 'nav-link-scrolled' : 'nav-link'}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {item.name}
-                </motion.button>
-              ))}
+              {regularNavItems.map((item) => 
+                item.isExternal ? (
+                  <motion.a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={isScrolled ? 'nav-link-scrolled text-primary-sunset font-semibold' : 'nav-link text-primary-sunset font-semibold'}
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {item.name}
+                  </motion.a>
+                ) : (
+                  <motion.button
+                    key={item.name}
+                    onClick={() => handleNavClick(item.href)}
+                    className={isScrolled ? 'nav-link-scrolled' : 'nav-link'}
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {item.name}
+                  </motion.button>
+                )
+              )}
               
               {/* Login Button */}
               <motion.button
@@ -148,17 +163,32 @@ const Navbar = () => {
             className="md:hidden bg-white/95 backdrop-blur-md rounded-lg shadow-lg mt-2 p-4"
           >
             <div className="space-y-2">
-              {regularNavItems.map((item) => (
-                <motion.button
-                  key={item.name}
-                  onClick={() => handleNavClick(item.href)}
-                  className="block w-full text-left px-3 py-2 rounded-md text-gray-700 hover:text-primary-sunset hover:bg-gray-50 transition-colors duration-200"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {item.name}
-                </motion.button>
-              ))}
+              {regularNavItems.map((item) => 
+                item.isExternal ? (
+                  <motion.a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full text-left px-3 py-2 rounded-md text-primary-sunset font-semibold hover:bg-gray-50 transition-colors duration-200"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </motion.a>
+                ) : (
+                  <motion.button
+                    key={item.name}
+                    onClick={() => handleNavClick(item.href)}
+                    className="block w-full text-left px-3 py-2 rounded-md text-gray-700 hover:text-primary-sunset hover:bg-gray-50 transition-colors duration-200"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {item.name}
+                  </motion.button>
+                )
+              )}
               
               {/* Login Button for Mobile */}
               <motion.button

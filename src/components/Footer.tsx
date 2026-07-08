@@ -68,6 +68,17 @@ const Footer = () => {
                 </a>
               </li>
               <li>
+                <a 
+                  href="https://highlandersfitness.store/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary-sunset font-semibold hover:text-white transition-colors duration-200 inline-flex items-center gap-1"
+                >
+                  <span>Online Store</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </li>
+              <li>
                 <a href="#contact" className="text-gray-300 hover:text-white transition-colors duration-200">
                   Contact
                 </a>

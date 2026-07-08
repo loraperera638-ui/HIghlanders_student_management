@@ -26,7 +26,7 @@
   }
   
   .gradient-border {
-    background: linear-gradient(135deg, #FF5A1F, #00A8E8);
+    background: linear-gradient(135deg, #FF5A1F, #c8a84b);
     padding: 1px;
     border-radius: 1rem;
   }
@@ -46,7 +46,7 @@
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-sunset via-red-500 to-primary-wave font-bold;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-sunset to-amber-500 font-bold;
   }
   
   .btn-primary {
@@ -115,10 +115,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #ff6b35, #4a90e2);
+  background: linear-gradient(135deg, #FF5A1F, #0A1128);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #e55a2b, #3a7bc8);
+  background: linear-gradient(135deg, #FF3E00, #050814);
 }

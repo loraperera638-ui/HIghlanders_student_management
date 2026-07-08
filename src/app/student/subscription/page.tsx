@@ -300,7 +300,7 @@ export default function StudentSubscription() {
             } ${plan.current ? 'ring-2 ring-green-500' : ''}`}
           >
             {plan.isPopular && (
-              <div className="bg-gradient-to-r from-primary-sunset to-primary-wave text-white text-center py-2">
+              <div className="bg-gradient-to-r from-primary-sunset to-[#FF3E00] text-white text-center py-2">
                 <span className="text-sm font-semibold flex items-center justify-center">
                   <Star className="w-4 h-4 mr-1" />
                   Most Popular
@@ -342,7 +342,7 @@ export default function StudentSubscription() {
                   plan.current
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : plan.isPopular
-                    ? 'bg-gradient-to-r from-primary-sunset to-primary-wave text-white hover:shadow-lg'
+                    ? 'bg-gradient-to-r from-primary-sunset to-[#FF3E00] text-white hover:shadow-lg hover:shadow-primary-sunset/20'
                     : 'bg-gray-900 text-white hover:bg-gray-800'
                 } ${selectedPlan === plan.id ? 'opacity-50 cursor-wait' : ''}`}
               >

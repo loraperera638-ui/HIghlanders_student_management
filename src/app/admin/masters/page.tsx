@@ -217,7 +217,7 @@ export default function AdminMasters() {
         {masters.map((master) => (
           <div key={master._id} className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Master Image */}
-            <div className="h-48 bg-gradient-to-br from-primary-sunset to-primary-wave flex items-center justify-center">
+            <div className="h-48 bg-gradient-to-br from-primary-navy to-[#121c3f] flex items-center justify-center">
               {master.image?.url ? (
                 <img
                   src={master.image.url}

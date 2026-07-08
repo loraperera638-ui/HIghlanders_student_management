@@ -76,8 +76,9 @@ const AboutSection = ({ historyText }: AboutSectionProps) => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20"
         >
-          <div className="bg-gradient-to-br from-primary-sunset to-primary-wave p-8 rounded-2xl text-white">
-            <h3 className="text-3xl font-bold mb-4 font-athletic">Our Vision</h3>
+          <div className="bg-[#0A1128] border border-white/10 p-8 rounded-2xl text-white relative overflow-hidden">
+            <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary-sunset/15 rounded-full blur-2xl" />
+            <h3 className="text-3xl font-bold mb-4 font-athletic text-primary-sunset uppercase tracking-wider">Our Vision</h3>
             <p className="text-lg leading-relaxed">
               To be the leading Taekwondo community in Scotland, fostering personal growth, 
               physical fitness, and mental discipline through the art of Taekwondo. 
@@ -115,7 +116,7 @@ const AboutSection = ({ historyText }: AboutSectionProps) => {
                 transition={{ duration: 0.6, delay: 0.1 * index }}
                 className="text-center"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-primary-sunset to-primary-wave rounded-full flex items-center justify-center text-white mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary-sunset to-[#FF3E00] rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-md shadow-primary-sunset/20">
                   {value.icon}
                 </div>
                 <h4 className="text-xl font-semibold mb-2 text-gray-900">{value.title}</h4>
@@ -148,7 +149,7 @@ const AboutSection = ({ historyText }: AboutSectionProps) => {
                     {/* Master avatar image */}
                     {master.image?.url ? (
                       <div className="relative w-32 h-32 flex-shrink-0">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary-sunset to-primary-wave rounded-full blur-sm opacity-45 animate-pulse-slow" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary-sunset to-[#FF3E00] rounded-full blur-sm opacity-45 animate-pulse-slow" />
                         <img 
                           src={master.image.url} 
                           alt={master.name}
@@ -156,7 +157,7 @@ const AboutSection = ({ historyText }: AboutSectionProps) => {
                         />
                       </div>
                     ) : (
-                      <div className="w-32 h-32 bg-gradient-to-br from-primary-sunset to-primary-wave rounded-full flex items-center justify-center text-white flex-shrink-0">
+                      <div className="w-32 h-32 bg-gradient-to-br from-primary-sunset to-[#FF3E00] rounded-full flex items-center justify-center text-white flex-shrink-0">
                         <span className="text-3xl font-bold">
                           {master.name.split(' ').map(n => n[0]).join('')}
                         </span>
@@ -197,7 +198,8 @@ const AboutSection = ({ historyText }: AboutSectionProps) => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-20"
         >
-          <div className="bg-gradient-to-r from-primary-navy to-primary-wave rounded-2xl p-12 text-white text-center">
+          <div className="bg-gradient-to-r from-primary-navy to-[#121c3f] border border-white/5 rounded-2xl p-12 text-white text-center relative overflow-hidden shadow-xl">
+            <div className="absolute -top-12 -right-12 w-40 h-40 bg-primary-sunset/10 rounded-full blur-3xl" />
             <h3 className="text-3xl font-bold mb-6 font-athletic">Our History</h3>
             <p className="text-lg max-w-3xl mx-auto leading-relaxed whitespace-pre-wrap">
               {historyText || `Founded in 2015, Highlanders Amateur Taekwondo CIC has grown from a small class 

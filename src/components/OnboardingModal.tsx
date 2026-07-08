@@ -153,7 +153,7 @@ By accepting these terms, you confirm that you have read, understood, and agree 
           className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary-sunset to-primary-wave text-white p-6 relative">
+          <div className="bg-gradient-to-r from-primary-navy to-[#121c3f] border-b-2 border-primary-sunset text-white p-6 relative">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold font-athletic">Join Highlanders Taekwondo</h2>
