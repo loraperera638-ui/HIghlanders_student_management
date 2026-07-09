@@ -39,15 +39,14 @@ export async function POST(request: NextRequest) {
     const firstName = nameParts[0] || 'Student';
     const lastName = nameParts.slice(1).join(' ') || 'Member';
 
-    // 4. Encrypt default password
-    const bcrypt = await import('bcryptjs');
+    // 4. Set default password
     const defaultPassword = 'password123';
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
     // 5. Create user record
     const newUser = {
       email: inquiry.email,
-      password: hashedPassword,
+      password: defaultPassword,
+      plainPassword: defaultPassword,
       role: 'student',
       profile: {
         firstName,
@@ -69,6 +68,7 @@ export async function POST(request: NextRequest) {
       email: inquiry.email,
       phone: inquiry.phone || '',
       status: 'approved',
+      plainPassword: defaultPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

@@ -24,17 +24,17 @@ export class AuthService {
   }
 
   /**
-   * Hash password
+   * Hash password (Plain text)
    */
   static async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 12);
+    return password;
   }
 
   /**
-   * Compare passwords
+   * Compare passwords (Plain text)
    */
   static async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
+    return password === hashedPassword;
   }
 
   /**

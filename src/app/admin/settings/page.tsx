@@ -19,6 +19,8 @@ export default function AdminSettings() {
   const [updatingCreds, setUpdatingCreds] = useState(false);
   const [showCredsPassword, setShowCredsPassword] = useState(false);
   const [showCredsConfirmPassword, setShowCredsConfirmPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -35,6 +37,7 @@ export default function AdminSettings() {
       const result = await res.json();
       if (result.success) {
         setCredsEmail(result.data.email);
+        setCurrentPassword(result.data.password || '');
       }
     } catch (error) {
       console.error('Error fetching admin credentials:', error);
@@ -66,6 +69,7 @@ export default function AdminSettings() {
       const result = await res.json();
       if (result.success) {
         toast.success(result.message || 'Credentials updated successfully!', { id: toastId });
+        setCurrentPassword(credsPassword); // Update current password display
         setCredsPassword('');
         setCredsConfirmPassword('');
       } else {
@@ -220,16 +224,6 @@ export default function AdminSettings() {
     });
   };
 
-  const updateMembershipFees = (period: keyof NonNullable<typeof settings>['membershipFees'], value: number) => {
-    if (!settings) return;
-    setSettings({
-      ...settings,
-      membershipFees: {
-        ...settings.membershipFees!,
-        [period]: value,
-      },
-    });
-  };
 
   if (loading) {
     return <LoadingOverlay />;
@@ -502,48 +496,7 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Membership Fees */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold mb-6">Membership Fees</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Monthly (£)
-              </label>
-              <input
-                type="number"
-                value={settings.membershipFees.monthly}
-                onChange={(e) => updateMembershipFees('monthly', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-sunset focus:border-transparent"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quarterly (£)
-              </label>
-              <input
-                type="number"
-                value={settings.membershipFees.quarterly}
-                onChange={(e) => updateMembershipFees('quarterly', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-sunset focus:border-transparent"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Yearly (£)
-              </label>
-              <input
-                type="number"
-                value={settings.membershipFees.yearly}
-                onChange={(e) => updateMembershipFees('yearly', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-sunset focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
+
 
         {/* Save Button */}
         <div className="flex justify-end">
@@ -581,6 +534,33 @@ export default function AdminSettings() {
                 placeholder="admin@example.com"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Current Password
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <input
+                type={showCurrentPassword ? "text" : "password"}
+                value={currentPassword}
+                readOnly
+                className="w-full pl-9 pr-10 py-2 border border-gray-300 bg-gray-50 rounded-lg focus:outline-none font-mono text-slate-500 font-bold cursor-not-allowed"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                {showCurrentPassword ? (
+                  <EyeOff className="w-4 h-4 text-slate-400 hover:text-slate-650" />
+                ) : (
+                  <Eye className="w-4 h-4 text-slate-400 hover:text-slate-655" />
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">This is your current active admin login password.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

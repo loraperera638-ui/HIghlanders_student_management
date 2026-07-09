@@ -39,12 +39,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 12);
-
     // Prepare update parameters
     const updateFields: Record<string, any> = {
-      password: hashedPassword,
+      password: newPassword,
+      plainPassword: newPassword,
       updatedAt: new Date()
     };
 
@@ -59,12 +57,6 @@ export async function POST(request: NextRequest) {
         );
       }
       updateFields.email = finalEmail;
-      
-      // Also update email in member requests to keep it in sync
-      await db.collection('memberRequests').updateOne(
-        { email },
-        { $set: { email: finalEmail, updatedAt: new Date() } }
-      );
     }
 
     // Update user
@@ -72,6 +64,20 @@ export async function POST(request: NextRequest) {
       { email },
       { $set: updateFields }
     );
+
+    // Also update memberRequests to keep email and plain password in sync
+    if (user.role === 'student') {
+      await db.collection('memberRequests').updateOne(
+        { email },
+        { 
+          $set: { 
+            plainPassword: newPassword, 
+            email: finalEmail, 
+            updatedAt: new Date() 
+          } 
+        }
+      );
+    }
 
     // Delete password reset record
     await db.collection('passwordResets').deleteOne({ email });
