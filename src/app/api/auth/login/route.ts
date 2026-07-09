@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const adminExists = await db.collection('users').findOne({ role: 'admin' });
     if (!adminExists) {
       console.log('[Auth Seeder] Creating default admin: admin@example.com / 12345');
-      const defaultAdminPassword = await bcrypt.hash('12345', 12);
+      const defaultAdminPassword = '12345';
       await db.collection('users').insertOne({
         email: 'admin@example.com',
         password: defaultAdminPassword,
@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
     let loggedInUser = null;
     
     if (dbUser) {
-      // Validate using bcrypt for database user
-      isPasswordValid = await bcrypt.compare(password, dbUser.password);
+      // Validate using plain-text comparison
+      isPasswordValid = (password === dbUser.password);
       if (isPasswordValid) {
         loggedInUser = {
           email: dbUser.email,

@@ -22,7 +22,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: { email: admin.email }
+      data: { 
+        email: admin.email,
+        password: admin.password
+      }
     });
   } catch (error) {
     console.error('Error fetching admin profile:', error);
@@ -52,20 +55,18 @@ export async function POST(request: NextRequest) {
     // Check if new email is taken by another user
     const emailTaken = await db.collection('users').findOne({
       email: finalEmail,
-      _id: { $ne: new ObjectId(admin._id) }
+      _id: { $ne: admin._id as any }
     });
     if (emailTaken) {
       return NextResponse.json({ success: false, error: 'This email is already in use by another account' }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-
     await db.collection('users').updateOne(
-      { _id: new ObjectId(admin._id) },
+      { _id: admin._id as any },
       { 
         $set: { 
           email: finalEmail,
-          password: hashedPassword,
+          password: password,
           updatedAt: new Date()
         } 
       }

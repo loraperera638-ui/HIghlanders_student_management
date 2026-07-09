@@ -91,25 +91,29 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Update the request status
-    await db.collection('memberRequests').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { status, updatedAt: new Date() } }
-    );
-
     // If approved, create a student user account
     if (status === 'approved') {
+      const defaultPassword = 'password123';
+      
+      // Update the request status and set the default plain password
+      await db.collection('memberRequests').updateOne(
+        { _id: new ObjectId(id) },
+        { 
+          $set: { 
+            status, 
+            plainPassword: defaultPassword,
+            updatedAt: new Date() 
+          } 
+        }
+      );
+
       // Check if user already exists
       const existingUser = await db.collection('users').findOne({ email: memberRequest.email });
       if (!existingUser) {
-        const bcrypt = await import('bcryptjs');
-        // Hash a default password
-        const defaultPassword = 'password123';
-        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-
         const newUser = {
           email: memberRequest.email,
-          password: hashedPassword,
+          password: defaultPassword,
+          plainPassword: defaultPassword,
           role: 'student',
           profile: {
             firstName: memberRequest.firstName,
@@ -131,6 +135,12 @@ export async function PATCH(request: NextRequest) {
           data: { email: memberRequest.email, password: defaultPassword }
         });
       }
+    } else {
+      // Just update status (e.g. for rejected)
+      await db.collection('memberRequests').updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status, updatedAt: new Date() } }
+      );
     }
 
     return NextResponse.json({

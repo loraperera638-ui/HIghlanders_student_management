@@ -60,6 +60,7 @@ export interface MemberRequest {
   termsAcceptedAt: Date;
   status: 'pending' | 'approved' | 'rejected';
   credentialsCreated?: boolean;
+  plainPassword?: string;
   createdAt: Date;
   updatedAt: Date;
 }

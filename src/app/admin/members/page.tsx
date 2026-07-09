@@ -16,7 +16,9 @@ import {
   CheckCircle2, 
   XCircle,
   Key,
-  Lock
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { MemberRequest } from '@/types';
 import LoadingOverlay from '@/components/LoadingOverlay';
@@ -34,8 +36,12 @@ export default function AdminMembers() {
   const [isCredsOpen, setIsCredsOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<MemberRequest | null>(null);
   const [credsEmail, setCredsEmail] = useState('');
-  const [credsPassword, setCredsPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [credsSaving, setCredsSaving] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -63,19 +69,36 @@ export default function AdminMembers() {
   const handleOpenCredentialsModal = (member: MemberRequest) => {
     setSelectedMember(member);
     setCredsEmail(member.email);
-    // Generate a random 8-character password
-    const randPass = Math.random().toString(36).substring(2, 10);
-    setCredsPassword(randPass);
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+    if (member.credentialsCreated) {
+      setNewPassword('');
+      setConfirmPassword('');
+    } else {
+      // For first time setup, generate a random 8-character password
+      const randPass = Math.random().toString(36).substring(2, 10);
+      setNewPassword(randPass);
+      setConfirmPassword(randPass);
+    }
     setIsCredsOpen(true);
   };
 
   const handleSaveCredentials = async () => {
-    if (!selectedMember || !credsEmail || !credsPassword) {
-      toast.error('Email and password are required');
+    if (!selectedMember || !credsEmail) {
+      toast.error('Email is required');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('New password and confirm password do not match');
+      return;
+    }
+    if (!selectedMember.credentialsCreated && !newPassword) {
+      toast.error('Password is required');
       return;
     }
     setCredsSaving(true);
-    const toastId = toast.loading('Setting credentials...');
+    const toastId = toast.loading('Saving credentials...');
     try {
       const res = await fetch('/api/members/credentials', {
         method: 'POST',
@@ -83,20 +106,20 @@ export default function AdminMembers() {
         body: JSON.stringify({
           memberId: selectedMember._id,
           email: credsEmail,
-          password: credsPassword
+          password: newPassword || undefined
         })
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || 'Credentials successfully set!', { id: toastId });
+        toast.success(data.message || 'Credentials successfully saved!', { id: toastId });
         setIsCredsOpen(false);
         fetchMembers();
       } else {
-        toast.error(data.error || 'Failed to set credentials', { id: toastId });
+        toast.error(data.error || 'Failed to save credentials', { id: toastId });
       }
     } catch (err) {
       console.error(err);
-      toast.error('Network error. Failed to set credentials.', { id: toastId });
+      toast.error('Network error. Failed to save credentials.', { id: toastId });
     } finally {
       setCredsSaving(false);
     }
@@ -304,6 +327,8 @@ export default function AdminMembers() {
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input
             type="text"
+            name="search_field_no_autofill"
+            autoComplete="off"
             placeholder="Search by student name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -534,6 +559,11 @@ export default function AdminMembers() {
 
             {/* Modal Body */}
             <div className="p-6 space-y-4">
+              {/* Dummy hidden inputs to prevent browser autofill on other fields */}
+              <div className="absolute opacity-0 pointer-events-none w-0 h-0 overflow-hidden" aria-hidden="true">
+                <input type="text" name="chrome-username-dummy" />
+                <input type="password" name="chrome-password-dummy" />
+              </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   Login Email (Username)
@@ -542,6 +572,8 @@ export default function AdminMembers() {
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 transform -translate-y-1/2" />
                   <input
                     type="email"
+                    name="student_username_credential"
+                    autoComplete="new-username"
                     value={credsEmail}
                     onChange={(e) => setCredsEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-sunset/20 focus:border-primary-sunset transition-all font-semibold text-slate-700"
@@ -551,21 +583,87 @@ export default function AdminMembers() {
                 <p className="text-[10px] text-gray-400 mt-1 font-medium">This will be the student's username to log in.</p>
               </div>
 
+              {selectedMember.credentialsCreated && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Current Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 transform -translate-y-1/2" />
+                    <input
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={selectedMember.plainPassword || 'password123'}
+                      readOnly
+                      className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-150 rounded-xl bg-gray-50 focus:outline-none font-mono text-slate-500 font-bold cursor-not-allowed"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-655 transition-colors p-1"
+                      title={showCurrentPassword ? "Hide password" : "Show password"}
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-gray-400 mt-1 font-medium">This is the student's current active password.</p>
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Password
+                  {selectedMember.credentialsCreated ? "New Password" : "Password"}
                 </label>
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 transform -translate-y-1/2" />
                   <input
-                    type="text"
-                    value={credsPassword}
-                    onChange={(e) => setCredsPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-sunset/20 focus:border-primary-sunset transition-all font-mono text-slate-700 font-bold"
-                    placeholder="Enter password"
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    autoComplete="new-password"
+                    name="new_student_password"
+                    className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-sunset/20 focus:border-primary-sunset transition-all font-mono text-slate-700 font-bold"
+                    placeholder={selectedMember.credentialsCreated ? "Leave blank to keep current" : "Enter password"}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-655 transition-colors p-1"
+                    title={showNewPassword ? "Hide password" : "Show password"}
+                  >
+                    {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1 font-medium">An auto-generated password is provided. You can customize it.</p>
+                <p className="text-[10px] text-gray-400 mt-1 font-medium">
+                  {selectedMember.credentialsCreated 
+                    ? "Only fill this in to set a new password." 
+                    : "An auto-generated password is provided. You can customize it."}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  {selectedMember.credentialsCreated ? "Confirm New Password" : "Confirm Password"}
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 transform -translate-y-1/2" />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    name="confirm_student_password"
+                    className="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-sunset/20 focus:border-primary-sunset transition-all font-mono text-slate-700 font-bold"
+                    placeholder={selectedMember.credentialsCreated ? "Leave blank to keep current" : "Confirm password"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-655 transition-colors p-1"
+                    title={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start space-x-3">
@@ -587,7 +685,12 @@ export default function AdminMembers() {
               </button>
               <button
                 onClick={handleSaveCredentials}
-                disabled={credsSaving || !credsPassword || !isValidEmail(credsEmail)}
+                disabled={
+                  credsSaving || 
+                  (!selectedMember.credentialsCreated && !newPassword) || 
+                  (newPassword !== confirmPassword) ||
+                  !isValidEmail(credsEmail)
+                }
                 className="flex-1 sm:flex-initial px-5 py-2.5 bg-primary-sunset text-white hover:bg-primary-wave rounded-xl text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-1.5 disabled:opacity-50 disabled:cursor-not-allowed text-center"
               >
                 <span>{credsSaving ? 'Saving...' : 'Save & Inform Student'}</span>
